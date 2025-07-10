@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfluView - Complete User Journey Maps</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+        }
+
+        .tab.active {
+            background: white;
+            color: #4facfe;
+            border-bottom: 3px solid #4facfe;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .journey-map {
+            display: none;
+            padding: 40px 20px;
+        }
+
+        .journey-map.active {
+            display: block;
+        }
+
+        .journey-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .journey-title h2 {
+            font-size: 2.2em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .journey-title .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .journey-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .journey-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .journey-table td {
+            padding: 20px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+
+        .journey-table tr:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stage-cell {
+            background: linear-gradient(135deg, #dae8fc 0%, #b8d4ff 100%);
+            font-weight: 700;
+            color: #2c3e50;
+            border-radius: 10px;
+            margin: 5px;
+            padding: 15px 10px;
+        }
+
+        .action-cell {
+            background: linear-gradient(135deg, #fff2cc 0%, #ffe066 100%);
+            border-radius: 10px;
+            margin: 5px;
+            padding: 15px 10px;
+            font-weight: 500;
+        }
+
+        .emotion-cell {
+            background: linear-gradient(135deg, #f8cecc 0%, #ff9999 100%);
+            border-radius: 10px;
+            margin: 5px;
+            padding: 15px 10px;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        .touchpoint-cell {
+            background: linear-gradient(135deg, #e1d5e7 0%, #d1c4e9 100%);
+            border-radius: 10px;
+            margin: 5px;
+            padding: 15px 10px;
+            font-weight: 500;
+        }
+
+        .opportunity-cell {
+            background: linear-gradient(135deg, #d5e8d4 0%, #81c784 100%);
+            border-radius: 10px;
+            margin: 5px;
+            padding: 15px 10px;
+            font-weight: 500;
+        }
+
+        .journey-flow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .flow-arrow {
+            font-size: 2em;
+            color: #4facfe;
+            margin: 0 10px;
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .journey-table {
+                font-size: 0.9em;
+            }
+            
+            .journey-table th,
+            .journey-table td {
+                padding: 10px 8px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .tab {
+                padding: 15px 10px;
+                font-size: 1em;
+            }
+        }
+
+        .highlight {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ InfluView User Journey Maps</h1>
+            <p>Complete Creator & Brand Experience Journey</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('creator')">👤 Creator Journey</button>
+            <button class="tab" onclick="switchTab('brand')">🏢 Brand Journey</button>
+        </div>
+
+        <!-- Creator Journey Map -->
+        <div id="creator" class="journey-map active">
+            <div class="journey-title">
+                <h2><span class="emoji">👤</span>Creator Journey Map</h2>
+            </div>
+            
+            <table class="journey-table">
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Action</th>
+                        <th>Emotions</th>
+                        <th>Touchpoints</th>
+                        <th>Opportunities</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><div class="stage-cell">Awareness</div></td>
+                        <td><div class="action-cell">Sees ad / hears about InfluView</div></td>
+                        <td><div class="emotion-cell">Curious, excited</div></td>
+                        <td><div class="touchpoint-cell">Social media, word of mouth</div></td>
+                        <td><div class="opportunity-cell">Clear USP about ranking & visibility</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">Sign-Up</div></td>
+                        <td><div class="action-cell">Chooses Creator → Signs up & onboards</div></td>
+                        <td><div class="emotion-cell">Motivated, focused</div></td>
+                        <td><div class="touchpoint-cell">Onboarding UI</div></td>
+                        <td><div class="opportunity-cell">Smooth signup with social linking</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">Profile Creation</div></td>
+                        <td><div class="action-cell">Enters niche, bio, uploads media</div></td>
+                        <td><div class="emotion-cell">Confident, determined</div></td>
+                        <td><div class="touchpoint-cell">Profile form</div></td>
+                        <td><div class="opportunity-cell">Help tooltips, preview profile</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">Ranking Review</div></td>
+                        <td><div class="action-cell">Sees leaderboard position</div></td>
+                        <td><div class="emotion-cell">Competitive, proud</div></td>
+                        <td><div class="touchpoint-cell">League table UI</div></td>
+                        <td><div class="opportunity-cell">Badge system, weekly update alerts</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">Contact & Leads</div></td>
+                        <td><div class="action-cell">Receives brand messages</div></td>
+                        <td><div class="emotion-cell">Excited, hopeful</div></td>
+                        <td><div class="touchpoint-cell">In-app messaging, notifications</div></td>
+                        <td><div class="opportunity-cell">Analytics showing profile visits</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">Share & Grow</div></td>
+                        <td><div class="action-cell">Shares badge to social, improves content</div></td>
+                        <td><div class="emotion-cell">Motivated, happy</div></td>
+                        <td><div class="touchpoint-cell">Social share tools</div></td>
+                        <td><div class="opportunity-cell">Viral growth loop via badges</div></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="journey-flow">
+                <span>Awareness</span>
+                <span class="flow-arrow">→</span>
+                <span>Sign-Up</span>
+                <span class="flow-arrow">→</span>
+                <span>Profile Creation</span>
+                <span class="flow-arrow">→</span>
+                <span>Ranking Review</span>
+                <span class="flow-arrow">→</span>
+                <span>Contact & Leads</span>
+                <span class="flow-arrow">→</span>
+                <span>Share & Grow</span>
+            </div>
+        </div>
+
+        <!-- Brand Journey Map -->
+        <div id="brand" class="journey-map">
+            <div class="journey-title">
+                <h2><span class="emoji">🏢</span>Brand Journey Map</h2>
+            </div>
+            
+            <table class="journey-table">
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Action</th>
+                        <th>Emotions</th>
+                        <th>Touchpoints</th>
+                        <th>Opportunities</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><div class="stage-cell">Awareness</div></td>
+                        <td><div class="action-cell">Learns about InfluView</div></td>
+                        <td><div class="emotion-cell">Curious</div></td>
+                        <td><div class="touchpoint-cell">Blog, referrals</div></td>
+                        <td><div class="opportunity-cell">Emphasize "smart discovery" features</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">Sign-Up</div></td>
+                        <td><div class="action-cell">Chooses Brand → Signs up</div></td>
+                        <td><div class="emotion-cell">Ready to explore</div></td>
+                        <td><div class="touchpoint-cell">Sign-up form</div></td>
+                        <td><div class="opportunity-cell">Show creator benefits during sign-up</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">Search & Filter</div></td>
+                        <td><div class="action-cell">Browses creators by category/location</div></td>
+                        <td><div class="emotion-cell">Engaged, interested</div></td>
+                        <td><div class="touchpoint-cell">Discovery page</div></td>
+                        <td><div class="opportunity-cell">"Search Near Me", save search filters</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">View Profiles</div></td>
+                        <td><div class="action-cell">Explores detailed creator profiles</div></td>
+                        <td><div class="emotion-cell">Analytical</div></td>
+                        <td><div class="touchpoint-cell">Profile view</div></td>
+                        <td><div class="opportunity-cell">Transparent metrics & pricing</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">AI Recommendations</div></td>
+                        <td><div class="action-cell">Sees smart suggestions</div></td>
+                        <td><div class="emotion-cell">Impressed</div></td>
+                        <td><div class="touchpoint-cell">Recommendations module</div></td>
+                        <td><div class="opportunity-cell">Trust-building: explain AI logic</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">Contact Creator</div></td>
+                        <td><div class="action-cell">Shortlists or sends messages</div></td>
+                        <td><div class="emotion-cell">Decisive, ready to act</div></td>
+                        <td><div class="touchpoint-cell">Message/chat UI</div></td>
+                        <td><div class="opportunity-cell">Quick CTA to message creators</div></td>
+                    </tr>
+                    <tr>
+                        <td><div class="stage-cell">Subscribe</div></td>
+                        <td><div class="action-cell">Pays for full access</div></td>
+                        <td><div class="emotion-cell">Invested</div></td>
+                        <td><div class="touchpoint-cell">Subscription/payment page</div></td>
+                        <td><div class="opportunity-cell">Flexible plans, value messaging</div></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="journey-flow">
+                <span>Awareness</span>
+                <span class="flow-arrow">→</span>
+                <span>Sign-Up</span>
+                <span class="flow-arrow">→</span>
+                <span>Search & Filter</span>
+                <span class="flow-arrow">→</span>
+                <span>View Profiles</span>
+                <span class="flow-arrow">→</span>
+                <span>AI Recommendations</span>
+                <span class="flow-arrow">→</span>
+                <span>Contact Creator</span>
+                <span class="flow-arrow">→</span>
+                <span>Subscribe</span>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <h2>Journey Insights</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Creator Journey Stages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Brand Journey Stages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">13</div>
+                    <div class="stat-label">Total Touchpoints</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">13</div>
+                    <div class="stat-label">Optimization Opportunities</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all journey maps
+            document.querySelectorAll('.journey-map').forEach(map => {
+                map.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected journey map
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Add hover effects and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableRows = document.querySelectorAll('.journey-table tr');
+            
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                    this.style.transition = 'all 0.3s ease';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Add random highlight animation to opportunity cells
+            const opportunityCells = document.querySelectorAll('.opportunity-cell');
+            setInterval(() => {
+                const randomCell = opportunityCells[Math.floor(Math.random() * opportunityCells.length)];
+                randomCell.classList.add('highlight');
+                setTimeout(() => {
+                    randomCell.classList.remove('highlight');
+                }, 2000);
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
