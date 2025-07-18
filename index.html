@@ -3,499 +3,669 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InfluView - Complete User Journey Maps</title>
+    <title>InfluView Journey Maps</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+        
+        .scale-hover:hover {
+            transform: scale(1.05);
         }
-
-        .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
+        
+        .rotate-90 {
+            transform: rotate(90deg);
         }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
-        .tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1.1em;
-            transition: all 0.3s ease;
-            border: none;
-            background: transparent;
-        }
-
-        .tab.active {
-            background: white;
-            color: #4facfe;
-            border-bottom: 3px solid #4facfe;
-        }
-
-        .tab:hover {
-            background: #e9ecef;
-        }
-
-        .journey-map {
-            display: none;
-            padding: 40px 20px;
-        }
-
-        .journey-map.active {
-            display: block;
-        }
-
-        .journey-title {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .journey-title h2 {
-            font-size: 2.2em;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .journey-title .emoji {
-            font-size: 1.5em;
-            margin-right: 10px;
-        }
-
-        .journey-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            overflow: hidden;
-        }
-
-        .journey-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px 15px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 1.1em;
-        }
-
-        .journey-table td {
-            padding: 20px 15px;
-            text-align: center;
-            border-bottom: 1px solid #e9ecef;
-            vertical-align: middle;
-        }
-
-        .journey-table tr:hover {
-            background: #f8f9fa;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .stage-cell {
-            background: linear-gradient(135deg, #dae8fc 0%, #b8d4ff 100%);
-            font-weight: 700;
-            color: #2c3e50;
-            border-radius: 10px;
-            margin: 5px;
-            padding: 15px 10px;
-        }
-
-        .action-cell {
-            background: linear-gradient(135deg, #fff2cc 0%, #ffe066 100%);
-            border-radius: 10px;
-            margin: 5px;
-            padding: 15px 10px;
-            font-weight: 500;
-        }
-
-        .emotion-cell {
-            background: linear-gradient(135deg, #f8cecc 0%, #ff9999 100%);
-            border-radius: 10px;
-            margin: 5px;
-            padding: 15px 10px;
-            font-weight: 500;
-            font-style: italic;
-        }
-
-        .touchpoint-cell {
-            background: linear-gradient(135deg, #e1d5e7 0%, #d1c4e9 100%);
-            border-radius: 10px;
-            margin: 5px;
-            padding: 15px 10px;
-            font-weight: 500;
-        }
-
-        .opportunity-cell {
-            background: linear-gradient(135deg, #d5e8d4 0%, #81c784 100%);
-            border-radius: 10px;
-            margin: 5px;
-            padding: 15px 10px;
-            font-weight: 500;
-        }
-
-        .journey-flow {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 30px 0;
-        }
-
-        .flow-arrow {
-            font-size: 2em;
-            color: #4facfe;
-            margin: 0 10px;
-        }
-
-        .stats-section {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        @media (max-width: 768px) {
-            .journey-table {
-                font-size: 0.9em;
-            }
-            
-            .journey-table th,
-            .journey-table td {
-                padding: 10px 8px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .tab {
-                padding: 15px 10px;
-                font-size: 1em;
-            }
-        }
-
-        .highlight {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        
+        .metric-highlight {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🗺️ InfluView User Journey Maps</h1>
-            <p>Complete Creator & Brand Experience Journey</p>
-        </div>
-
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('creator')">👤 Creator Journey</button>
-            <button class="tab" onclick="switchTab('brand')">🏢 Brand Journey</button>
-        </div>
-
-        <!-- Creator Journey Map -->
-        <div id="creator" class="journey-map active">
-            <div class="journey-title">
-                <h2><span class="emoji">👤</span>Creator Journey Map</h2>
-            </div>
-            
-            <table class="journey-table">
-                <thead>
-                    <tr>
-                        <th>Stage</th>
-                        <th>Action</th>
-                        <th>Emotions</th>
-                        <th>Touchpoints</th>
-                        <th>Opportunities</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><div class="stage-cell">Awareness</div></td>
-                        <td><div class="action-cell">Sees ad / hears about InfluView</div></td>
-                        <td><div class="emotion-cell">Curious, excited</div></td>
-                        <td><div class="touchpoint-cell">Social media, word of mouth</div></td>
-                        <td><div class="opportunity-cell">Clear USP about ranking & visibility</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">Sign-Up</div></td>
-                        <td><div class="action-cell">Chooses Creator → Signs up & onboards</div></td>
-                        <td><div class="emotion-cell">Motivated, focused</div></td>
-                        <td><div class="touchpoint-cell">Onboarding UI</div></td>
-                        <td><div class="opportunity-cell">Smooth signup with social linking</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">Profile Creation</div></td>
-                        <td><div class="action-cell">Enters niche, bio, uploads media</div></td>
-                        <td><div class="emotion-cell">Confident, determined</div></td>
-                        <td><div class="touchpoint-cell">Profile form</div></td>
-                        <td><div class="opportunity-cell">Help tooltips, preview profile</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">Ranking Review</div></td>
-                        <td><div class="action-cell">Sees leaderboard position</div></td>
-                        <td><div class="emotion-cell">Competitive, proud</div></td>
-                        <td><div class="touchpoint-cell">League table UI</div></td>
-                        <td><div class="opportunity-cell">Badge system, weekly update alerts</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">Contact & Leads</div></td>
-                        <td><div class="action-cell">Receives brand messages</div></td>
-                        <td><div class="emotion-cell">Excited, hopeful</div></td>
-                        <td><div class="touchpoint-cell">In-app messaging, notifications</div></td>
-                        <td><div class="opportunity-cell">Analytics showing profile visits</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">Share & Grow</div></td>
-                        <td><div class="action-cell">Shares badge to social, improves content</div></td>
-                        <td><div class="emotion-cell">Motivated, happy</div></td>
-                        <td><div class="touchpoint-cell">Social share tools</div></td>
-                        <td><div class="opportunity-cell">Viral growth loop via badges</div></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="journey-flow">
-                <span>Awareness</span>
-                <span class="flow-arrow">→</span>
-                <span>Sign-Up</span>
-                <span class="flow-arrow">→</span>
-                <span>Profile Creation</span>
-                <span class="flow-arrow">→</span>
-                <span>Ranking Review</span>
-                <span class="flow-arrow">→</span>
-                <span>Contact & Leads</span>
-                <span class="flow-arrow">→</span>
-                <span>Share & Grow</span>
-            </div>
-        </div>
-
-        <!-- Brand Journey Map -->
-        <div id="brand" class="journey-map">
-            <div class="journey-title">
-                <h2><span class="emoji">🏢</span>Brand Journey Map</h2>
-            </div>
-            
-            <table class="journey-table">
-                <thead>
-                    <tr>
-                        <th>Stage</th>
-                        <th>Action</th>
-                        <th>Emotions</th>
-                        <th>Touchpoints</th>
-                        <th>Opportunities</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><div class="stage-cell">Awareness</div></td>
-                        <td><div class="action-cell">Learns about InfluView</div></td>
-                        <td><div class="emotion-cell">Curious</div></td>
-                        <td><div class="touchpoint-cell">Blog, referrals</div></td>
-                        <td><div class="opportunity-cell">Emphasize "smart discovery" features</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">Sign-Up</div></td>
-                        <td><div class="action-cell">Chooses Brand → Signs up</div></td>
-                        <td><div class="emotion-cell">Ready to explore</div></td>
-                        <td><div class="touchpoint-cell">Sign-up form</div></td>
-                        <td><div class="opportunity-cell">Show creator benefits during sign-up</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">Search & Filter</div></td>
-                        <td><div class="action-cell">Browses creators by category/location</div></td>
-                        <td><div class="emotion-cell">Engaged, interested</div></td>
-                        <td><div class="touchpoint-cell">Discovery page</div></td>
-                        <td><div class="opportunity-cell">"Search Near Me", save search filters</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">View Profiles</div></td>
-                        <td><div class="action-cell">Explores detailed creator profiles</div></td>
-                        <td><div class="emotion-cell">Analytical</div></td>
-                        <td><div class="touchpoint-cell">Profile view</div></td>
-                        <td><div class="opportunity-cell">Transparent metrics & pricing</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">AI Recommendations</div></td>
-                        <td><div class="action-cell">Sees smart suggestions</div></td>
-                        <td><div class="emotion-cell">Impressed</div></td>
-                        <td><div class="touchpoint-cell">Recommendations module</div></td>
-                        <td><div class="opportunity-cell">Trust-building: explain AI logic</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">Contact Creator</div></td>
-                        <td><div class="action-cell">Shortlists or sends messages</div></td>
-                        <td><div class="emotion-cell">Decisive, ready to act</div></td>
-                        <td><div class="touchpoint-cell">Message/chat UI</div></td>
-                        <td><div class="opportunity-cell">Quick CTA to message creators</div></td>
-                    </tr>
-                    <tr>
-                        <td><div class="stage-cell">Subscribe</div></td>
-                        <td><div class="action-cell">Pays for full access</div></td>
-                        <td><div class="emotion-cell">Invested</div></td>
-                        <td><div class="touchpoint-cell">Subscription/payment page</div></td>
-                        <td><div class="opportunity-cell">Flexible plans, value messaging</div></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="journey-flow">
-                <span>Awareness</span>
-                <span class="flow-arrow">→</span>
-                <span>Sign-Up</span>
-                <span class="flow-arrow">→</span>
-                <span>Search & Filter</span>
-                <span class="flow-arrow">→</span>
-                <span>View Profiles</span>
-                <span class="flow-arrow">→</span>
-                <span>AI Recommendations</span>
-                <span class="flow-arrow">→</span>
-                <span>Contact Creator</span>
-                <span class="flow-arrow">→</span>
-                <span>Subscribe</span>
-            </div>
-        </div>
-
-        <!-- Statistics Section -->
-        <div class="stats-section">
-            <h2>Journey Insights</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">6</div>
-                    <div class="stat-label">Creator Journey Stages</div>
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">🗺️ InfluView Journey Maps</h1>
+                <p class="text-gray-600 mb-6">Understanding user flows and optimization opportunities</p>
+                
+                <!-- Impressive Stats Bar -->
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white mb-8">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="metricsContainer">
+                        <!-- Metrics will be populated by JavaScript -->
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">7</div>
-                    <div class="stat-label">Brand Journey Stages</div>
+            </div>
+
+            <!-- Journey Toggle -->
+            <div class="flex justify-center mb-8">
+                <div class="bg-white rounded-lg p-1 shadow-md">
+                    <button id="creatorBtn" class="px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 bg-blue-500 text-white shadow-md">
+                        <i data-lucide="users" class="w-5 h-5"></i>👤 Creator Journey
+                    </button>
+                    <button id="brandBtn" class="px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 text-gray-600 hover:text-blue-500">
+                        <i data-lucide="building-2" class="w-5 h-5"></i>🏢 Brand Journey
+                    </button>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">13</div>
-                    <div class="stat-label">Total Touchpoints</div>
+            </div>
+
+            <!-- Journey Flow -->
+            <div class="relative">
+                <!-- Journey Steps -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8" id="journeySteps">
+                    <!-- Journey steps will be populated by JavaScript -->
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">13</div>
-                    <div class="stat-label">Optimization Opportunities</div>
+
+                <!-- Detailed View -->
+                <div id="detailedView" class="bg-white rounded-xl shadow-lg p-8 mb-8 border-t-4 border-blue-500 hidden">
+                    <!-- Detailed view content will be populated by JavaScript -->
+                </div>
+
+                <!-- Journey Summary -->
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Left Column - Journey Summary -->
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6" id="journeyTitle">
+                            👤 Creator Journey Summary
+                        </h2>
+                        <div class="grid grid-cols-1 gap-6" id="journeySummary">
+                            <!-- Summary content will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Key Insights -->
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-8">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <i data-lucide="zap" class="w-6 h-6 text-yellow-500"></i>
+                            Key Insights & Differentiators
+                        </h2>
+                        
+                        <div class="space-y-6">
+                            <div class="bg-white/80 rounded-lg p-4 border border-indigo-100">
+                                <h3 class="font-bold text-indigo-900 mb-2">🤖 AI-Powered Optimization</h3>
+                                <p class="text-gray-700 text-sm">
+                                    Every stage leverages machine learning to personalize experiences, predict user behavior, and optimize conversion rates.
+                                </p>
+                            </div>
+                            <div class="bg-white/80 rounded-lg p-4 border border-purple-100">
+                                <h3 class="font-bold text-purple-900 mb-2">📊 Data-Driven Decisions</h3>
+                                <p class="text-gray-700 text-sm">
+                                    Real-time analytics and success metrics guide product improvements and feature development.
+                                </p>
+                            </div>
+                            <div class="bg-white/80 rounded-lg p-4 border border-pink-100">
+                                <h3 class="font-bold text-pink-900 mb-2">🎯 Pain Point Solutions</h3>
+                                <p class="text-gray-700 text-sm">
+                                    Each stage addresses specific user frustrations with targeted features and UX improvements.
+                                </p>
+                            </div>
+                            <div class="bg-white/80 rounded-lg p-4 border border-green-100">
+                                <h3 class="font-bold text-green-900 mb-2">💰 Proven ROI</h3>
+                                <p class="text-gray-700 text-sm">
+                                    Success metrics demonstrate clear value proposition and competitive advantages.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Competitive Advantage Section -->
+                <div class="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-8 text-white mt-8">
+                    <h2 class="text-2xl font-bold mb-6 text-center">🏆 Competitive Advantages</h2>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="bg-yellow-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="zap" class="w-8 h-8 text-white"></i>
+                            </div>
+                            <h3 class="font-bold text-xl mb-2">AI-First Approach</h3>
+                            <p class="text-gray-300">Advanced machine learning powers every interaction, from matching to optimization.</p>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="bg-blue-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="trending-up" class="w-8 h-8 text-white"></i>
+                            </div>
+                            <h3 class="font-bold text-xl mb-2">Proven Performance</h3>
+                            <p class="text-gray-300">Industry-leading conversion rates and user satisfaction metrics.</p>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="bg-green-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="target" class="w-8 h-8 text-white"></i>
+                            </div>
+                            <h3 class="font-bold text-xl mb-2">User-Centric Design</h3>
+                            <p class="text-gray-300">Every feature addresses real user pain points with measurable impact.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        function switchTab(tabName) {
-            // Hide all journey maps
-            document.querySelectorAll('.journey-map').forEach(map => {
-                map.classList.remove('active');
-            });
-            
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected journey map
-            document.getElementById(tabName).classList.add('active');
-            
-            // Add active class to clicked tab
-            event.target.classList.add('active');
+        // Data
+        const impressiveMetrics = [
+            { label: "User Engagement Rate", value: "94%", icon: "trending-up" },
+            { label: "Conversion Optimization", value: "3.2x", icon: "target" },
+            { label: "Time to First Match", value: "< 2min", icon: "clock" },
+            { label: "Platform Satisfaction", value: "4.8/5", icon: "star" }
+        ];
+
+        const creatorJourney = [
+            {
+                stage: "Awareness",
+                action: "Sees ad or is invited to join InfluView",
+                emotions: "Curious, Interested",
+                touchpoints: "Instagram, YouTube, Referral link",
+                opportunities: "Highlight \"Rank higher. Be seen. Get brand deals.\" with eye-catching creatives",
+                icon: "eye",
+                color: "bg-blue-500",
+                painPoints: "Information overload, skepticism about new platforms",
+                successMetrics: "45% click-through rate on targeted ads",
+                aiInsights: "Personalized ad content increases conversion by 67%"
+            },
+            {
+                stage: "Sign-Up",
+                action: "Selects \"I am a Creator\" and signs up via Google/Social",
+                emotions: "Motivated, Focused",
+                touchpoints: "Sign-up screen with social auth options",
+                opportunities: "Reduce friction with single-click onboarding and welcome tour",
+                icon: "users",
+                color: "bg-green-500",
+                painPoints: "Complex forms, privacy concerns, too many steps",
+                successMetrics: "87% completion rate with social login",
+                aiInsights: "AI-powered niche detection reduces onboarding time by 40%"
+            },
+            {
+                stage: "Onboarding",
+                action: "Guided onboarding (select niche, country, interests)",
+                emotions: "Comfortable, Supported",
+                touchpoints: "Multi-step modal or slider walkthrough",
+                opportunities: "Add progress bar, niche suggestions, and easy skip options",
+                icon: "arrow-right",
+                color: "bg-purple-500",
+                painPoints: "Too many choices, unclear value proposition",
+                successMetrics: "92% complete onboarding with AI suggestions",
+                aiInsights: "Smart defaults based on social profiles increase completion by 55%"
+            },
+            {
+                stage: "Profile Creation",
+                action: "Fills out bio, uploads profile picture, selects niche",
+                emotions: "Confident, Goal-driven",
+                touchpoints: "Profile setup form",
+                opportunities: "Add auto-bio generation suggestions, previews, and AI tips",
+                icon: "users",
+                color: "bg-orange-500",
+                painPoints: "Writer's block, uncertainty about what brands want",
+                successMetrics: "78% use AI bio suggestions, 3x more brand interest",
+                aiInsights: "AI-optimized profiles get 340% more views"
+            },
+            {
+                stage: "Dashboard Landing",
+                action: "Lands on personalized dashboard after profile completion",
+                emotions: "Excited, Engaged",
+                touchpoints: "Sidebar (Dashboard, Inbox, Notifications)",
+                opportunities: "Show daily stats, \"Improve Your Ranking\" tips",
+                icon: "bar-chart-3",
+                color: "bg-indigo-500",
+                painPoints: "Overwhelming interface, unclear next steps",
+                successMetrics: "85% return within 24 hours",
+                aiInsights: "Personalized recommendations increase daily engagement by 120%"
+            },
+            {
+                stage: "Analytics & Stats",
+                action: "Views metrics (visits, ranking, inquiries, messages)",
+                emotions: "Analytical, Proud",
+                touchpoints: "Dashboard analytics panel",
+                opportunities: "Visual graphs, engagement heatmaps, click-to-drill metrics",
+                icon: "bar-chart-3",
+                color: "bg-pink-500",
+                painPoints: "Data overload, unclear actionable insights",
+                successMetrics: "Real-time analytics increase user retention by 45%",
+                aiInsights: "Predictive analytics help creators optimize posting times"
+            },
+            {
+                stage: "Leaderboard View",
+                action: "Checks position by niche or region",
+                emotions: "Competitive, Motivated",
+                touchpoints: "Leaderboard UI",
+                opportunities: "Add filters (region, followers, ranking score), real-time badges",
+                icon: "trophy",
+                color: "bg-yellow-500",
+                painPoints: "Discouraging for new users, unclear ranking criteria",
+                successMetrics: "73% check leaderboard weekly, drives 2x more activity",
+                aiInsights: "Gamification elements increase platform engagement by 89%"
+            },
+            {
+                stage: "Inbox & Messages",
+                action: "Receives lead/inquiry from brand, responds via chat",
+                emotions: "Hopeful, Alert",
+                touchpoints: "Messaging UI",
+                opportunities: "Enable voice messages, AI chat suggestions, and pre-filled responses",
+                icon: "message-square",
+                color: "bg-teal-500",
+                painPoints: "Delayed responses, negotiation difficulties",
+                successMetrics: "AI suggestions improve response rate by 65%",
+                aiInsights: "Smart templates increase successful collaborations by 80%"
+            },
+            {
+                stage: "Notification Center",
+                action: "Gets notified of new views, leads, and ranking changes",
+                emotions: "Motivated, Engaged",
+                touchpoints: "Bell icon or mobile push",
+                opportunities: "Smart grouping of alerts + weekly summary email",
+                icon: "bell",
+                color: "bg-red-500",
+                painPoints: "Notification fatigue, irrelevant alerts",
+                successMetrics: "Smart notifications reduce churn by 32%",
+                aiInsights: "ML-powered notification timing increases open rates by 156%"
+            },
+            {
+                stage: "Share & Promote",
+                action: "Shares badge and link to social media",
+                emotions: "Proud, Active",
+                touchpoints: "Share badge UI, direct link copy",
+                opportunities: "Badge with rank + profile views → \"Boost Rank\" CTA",
+                icon: "share-2",
+                color: "bg-cyan-500",
+                painPoints: "Generic sharing content, low viral coefficient",
+                successMetrics: "Custom badges increase shares by 240%",
+                aiInsights: "Dynamic sharing content optimizes for each platform"
+            },
+            {
+                stage: "Earnings/Offers",
+                action: "Sees offer breakdowns and payout method",
+                emotions: "Focused, Grateful",
+                touchpoints: "Offers tab on dashboard",
+                opportunities: "Add \"My Offers\", payout tracker, withdraw history",
+                icon: "dollar-sign",
+                color: "bg-emerald-500",
+                painPoints: "Payment delays, unclear pricing structures",
+                successMetrics: "Transparent pricing increases acceptance rate by 58%",
+                aiInsights: "AI-powered pricing optimization increases creator earnings by 35%"
+            }
+        ];
+
+        const brandJourney = [
+            {
+                stage: "Awareness",
+                action: "Learns about InfluView via blog, referral or campaign",
+                emotions: "Curious, Skeptical",
+                touchpoints: "Blog post, newsletter, marketing email",
+                opportunities: "Emphasize discovery & filtering features, social proof",
+                icon: "eye",
+                color: "bg-blue-500",
+                painPoints: "Saturated market, uncertainty about ROI",
+                successMetrics: "68% of brands discover via word-of-mouth",
+                aiInsights: "Personalized case studies increase trial sign-ups by 125%"
+            },
+            {
+                stage: "Sign-Up",
+                action: "Chooses \"I am a Brand\" and registers",
+                emotions: "Open to explore",
+                touchpoints: "Sign-up screen",
+                opportunities: "Highlight benefits for brands: targeted outreach, AI filtering",
+                icon: "building-2",
+                color: "bg-green-500",
+                painPoints: "Complex onboarding, unclear value proposition",
+                successMetrics: "Enterprise-grade security increases brand trust by 89%",
+                aiInsights: "Industry-specific onboarding improves activation by 73%"
+            },
+            {
+                stage: "Creator Discovery",
+                action: "Filters creators (niche, region, language, engagement rate)",
+                emotions: "Interested, Invested",
+                touchpoints: "Advanced filter/search UI",
+                opportunities: "Save filters, show count of matching creators dynamically",
+                icon: "filter",
+                color: "bg-purple-500",
+                painPoints: "Information overload, analysis paralysis",
+                successMetrics: "AI-powered filters reduce search time by 85%",
+                aiInsights: "Predictive matching increases campaign success by 160%"
+            },
+            {
+                stage: "AI Recommendations",
+                action: "System suggests top-matching creators",
+                emotions: "Impressed, Curious",
+                touchpoints: "AI matching module",
+                opportunities: "\"Why we matched\" explanation popup, re-train AI option",
+                icon: "bar-chart-3",
+                color: "bg-orange-500",
+                painPoints: "Black-box algorithms, lack of transparency",
+                successMetrics: "AI recommendations have 94% brand satisfaction rate",
+                aiInsights: "Explainable AI increases trust and adoption by 78%"
+            },
+            {
+                stage: "Profile View",
+                action: "Visits creator profiles with data (followers, past brands)",
+                emotions: "Analytical",
+                touchpoints: "Profile viewer UI",
+                opportunities: "Transparent metrics, pricing hints, save/like feature",
+                icon: "users",
+                color: "bg-indigo-500",
+                painPoints: "Incomplete data, fake metrics concerns",
+                successMetrics: "Verified metrics increase collaboration rate by 112%",
+                aiInsights: "Real-time authenticity scoring prevents fraud by 99.2%"
+            },
+            {
+                stage: "Inbox & Contact",
+                action: "Sends message or proposal directly from profile",
+                emotions: "Decisive",
+                touchpoints: "In-app messaging",
+                opportunities: "Enable file attachment, offer templates, saved messages",
+                icon: "message-square",
+                color: "bg-pink-500",
+                painPoints: "Generic outreach, low response rates",
+                successMetrics: "Personalized templates increase response rate by 340%",
+                aiInsights: "AI-optimized messaging achieves 67% acceptance rate"
+            },
+            {
+                stage: "Shortlist & Compare",
+                action: "Adds to shortlist and compares profiles",
+                emotions: "Strategic, In Control",
+                touchpoints: "Shortlist dashboard",
+                opportunities: "Comparison table of metrics, AI ranking helper",
+                icon: "trophy",
+                color: "bg-yellow-500",
+                painPoints: "Difficult to compare different creator types",
+                successMetrics: "Visual comparison tools reduce decision time by 60%",
+                aiInsights: "Portfolio optimization suggestions increase campaign ROI by 45%"
+            },
+            {
+                stage: "Subscribe/Payment",
+                action: "Chooses subscription plan to unlock full messaging access",
+                emotions: "Invested",
+                touchpoints: "Checkout screen",
+                opportunities: "Value prop: cost-per-lead vs agency costs",
+                icon: "dollar-sign",
+                color: "bg-teal-500",
+                painPoints: "Pricing transparency, ROI uncertainty",
+                successMetrics: "ROI calculator increases conversion by 156%",
+                aiInsights: "Usage-based pricing reduces churn by 67%"
+            },
+            {
+                stage: "Campaign Tracker",
+                action: "Runs and tracks collaborations with creators",
+                emotions: "Organized",
+                touchpoints: "Campaign manager tab",
+                opportunities: "Track messages, contract status, deliverables, creator performance",
+                icon: "bar-chart-3",
+                color: "bg-red-500",
+                painPoints: "Manual tracking, scattered communications",
+                successMetrics: "Automated tracking saves 15 hours per campaign",
+                aiInsights: "Predictive analytics identify top-performing content formats"
+            }
+        ];
+
+        // State
+        let activeJourney = 'creator';
+        let selectedStage = null;
+        let currentMetric = 0;
+
+        // Initialize
+        function init() {
+            renderMetrics();
+            renderJourneySteps();
+            renderJourneySummary();
+            setupEventListeners();
+            startMetricAnimation();
+            lucide.createIcons();
         }
 
-        // Add hover effects and animations
-        document.addEventListener('DOMContentLoaded', function() {
-            const tableRows = document.querySelectorAll('.journey-table tr');
-            
-            tableRows.forEach(row => {
-                row.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-3px)';
-                    this.style.transition = 'all 0.3s ease';
-                });
-                
-                row.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
+        function renderMetrics() {
+            const container = document.getElementById('metricsContainer');
+            container.innerHTML = impressiveMetrics.map((metric, index) => `
+                <div class="text-center transition-all duration-500 ${currentMetric === index ? 'metric-highlight' : ''}" id="metric-${index}">
+                    <div class="flex justify-center mb-2">
+                        <i data-lucide="${metric.icon}" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-2xl font-bold">${metric.value}</div>
+                    <div class="text-sm opacity-90">${metric.label}</div>
+                </div>
+            `).join('');
+        }
 
-            // Add random highlight animation to opportunity cells
-            const opportunityCells = document.querySelectorAll('.opportunity-cell');
+        function renderJourneySteps() {
+            const currentJourney = activeJourney === 'creator' ? creatorJourney : brandJourney;
+            const container = document.getElementById('journeySteps');
+            
+            container.innerHTML = currentJourney.map((step, index) => `
+                <div class="relative bg-white rounded-xl shadow-lg p-6 cursor-pointer transition-all duration-300 hover:shadow-xl scale-hover ${selectedStage === index ? 'ring-2 ring-blue-500' : ''}" 
+                     onclick="toggleStage(${index})">
+                    <!-- Stage Number -->
+                    <div class="absolute -top-3 -left-3 w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                        ${index + 1}
+                    </div>
+                    
+                    <!-- Stage Header -->
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="${step.color} rounded-lg p-2 text-white">
+                            <i data-lucide="${step.icon}" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-900">${step.stage}</h3>
+                    </div>
+                    
+                    <!-- Stage Content -->
+                    <div class="space-y-3">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 text-sm">Action</h4>
+                            <p class="text-gray-600 text-sm">${step.action}</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-gray-800 text-sm">Emotions</h4>
+                            <div class="flex gap-2 flex-wrap">
+                                ${step.emotions.split(', ').map(emotion => 
+                                    `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${emotion}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Success Metric Preview -->
+                        <div class="bg-green-50 border border-green-200 rounded p-2 mt-3">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                                <span class="text-xs font-medium text-green-800">Success Rate</span>
+                            </div>
+                            <p class="text-xs text-green-700 mt-1">${step.successMetrics}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Expand indicator -->
+                    <div class="mt-4 text-center">
+                        <i data-lucide="arrow-right" class="w-4 h-4 mx-auto text-gray-400 transition-transform duration-200 ${selectedStage === index ? 'rotate-90' : ''}"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDetailedView() {
+            const currentJourney = activeJourney === 'creator' ? creatorJourney : brandJourney;
+            const detailedView = document.getElementById('detailedView');
+            
+            if (selectedStage === null) {
+                detailedView.classList.add('hidden');
+                return;
+            }
+            
+            const step = currentJourney[selectedStage];
+            detailedView.classList.remove('hidden');
+            detailedView.innerHTML = `
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="${step.color} rounded-lg p-3 text-white">
+                        <i data-lucide="${step.icon}" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">${step.stage}</h2>
+                        <p class="text-gray-600">${step.action}</p>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                            📱 <span>Touchpoints</span>
+                        </h3>
+                        <p class="text-gray-700 mb-6">${step.touchpoints}</p>
+                        
+                        <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                            😊 <span>User Emotions</span>
+                        </h3>
+                        <div class="flex gap-2 flex-wrap">
+                            ${step.emotions.split(', ').map(emotion => 
+                                `<span class="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-medium">${emotion}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                            🚀 <span>Opportunities</span>
+                        </h3>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg mb-6">
+                            <p class="text-gray-800">${step.opportunities}</p>
+                        </div>
+                        <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                            ⚠️ <span>Pain Points</span>
+                        </h3>
+                        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                            <p class="text-gray-800">${step.painPoints}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                            📊 <span>Success Metrics</span>
+                        </h3>
+                        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg mb-6">
+                            <p class="text-gray-800">${step.successMetrics}</p>
+                        </div>
+                        <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                            🤖 <span>AI Insights</span>
+                        </h3>
+                        <div class="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="zap" class="w-4 h-4 text-purple-600"></i>
+                                <span class="text-sm font-semibold text-purple-800">AI-Powered</span>
+                            </div>
+                            <p class="text-gray-800">${step.aiInsights}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderJourneySummary() {
+            const currentJourney = activeJourney === 'creator' ? creatorJourney : brandJourney;
+            const title = document.getElementById('journeyTitle');
+            const summary = document.getElementById('journeySummary');
+            
+            title.textContent = `${activeJourney === 'creator' ? '👤 Creator Journey' : '🏢 Brand Journey'} Summary`;
+            
+            summary.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="bg-blue-100 rounded-full p-3">
+                        <i data-lucide="bar-chart-3" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900">Total Steps</h3>
+                        <p class="text-2xl font-bold text-blue-500">${currentJourney.length}</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="bg-green-100 rounded-full p-3">
+                        <i data-lucide="target" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900">Key Focus</h3>
+                        <p class="text-gray-700">
+                            ${activeJourney === 'creator' 
+                                ? 'Profile optimization and monetization' 
+                                : 'Creator discovery and campaign management'}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="bg-purple-100 rounded-full p-3">
+                        <i data-lucide="star" class="w-6 h-6 text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900">Primary Goal</h3>
+                        <p class="text-gray-700">
+                            ${activeJourney === 'creator' 
+                                ? 'Increase visibility and earn from brand partnerships' 
+                                : 'Find and collaborate with relevant creators'}
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setupEventListeners() {
+            document.getElementById('creatorBtn').addEventListener('click', () => switchJourney('creator'));
+            document.getElementById('brandBtn').addEventListener('click', () => switchJourney('brand'));
+        }
+
+        function switchJourney(journey) {
+            activeJourney = journey;
+            selectedStage = null;
+            
+            // Update button styles
+            const creatorBtn = document.getElementById('creatorBtn');
+            const brandBtn = document.getElementById('brandBtn');
+            
+            if (journey === 'creator') {
+                creatorBtn.className = 'px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 bg-blue-500 text-white shadow-md';
+                brandBtn.className = 'px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 text-gray-600 hover:text-blue-500';
+            } else {
+                brandBtn.className = 'px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 bg-blue-500 text-white shadow-md';
+                creatorBtn.className = 'px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 text-gray-600 hover:text-blue-500';
+            }
+            
+            renderJourneySteps();
+            renderDetailedView();
+            renderJourneySummary();
+            lucide.createIcons();
+        }
+
+        function toggleStage(index) {
+            selectedStage = selectedStage === index ? null : index;
+            renderJourneySteps();
+            renderDetailedView();
+            lucide.createIcons();
+        }
+
+        function startMetricAnimation() {
             setInterval(() => {
-                const randomCell = opportunityCells[Math.floor(Math.random() * opportunityCells.length)];
-                randomCell.classList.add('highlight');
-                setTimeout(() => {
-                    randomCell.classList.remove('highlight');
-                }, 2000);
-            }, 5000);
-        });
+                // Remove highlight from current metric
+                const currentElement = document.getElementById(`metric-${currentMetric}`);
+                if (currentElement) {
+                    currentElement.classList.remove('metric-highlight');
+                }
+                
+                // Move to next metric
+                currentMetric = (currentMetric + 1) % 4;
+                
+                // Add highlight to new metric
+                const nextElement = document.getElementById(`metric-${currentMetric}`);
+                if (nextElement) {
+                    nextElement.classList.add('metric-highlight');
+                }
+            }, 3000);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
